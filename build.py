@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import os, sys, shutil, re, textwrap
 
 COMPILER = "i586-pc-msdosdjgpp-gcc"
@@ -28,7 +28,7 @@ def make_c_include(name, data):
     name = re.sub("[^a-z0-9]", "_", name.lower())
     res = "static const char " + name + "[] = {"
     for c in data:
-        res += str(ord(c)) + ", "
+        res += str(c) + ", "
     res = res.rstrip(", ") + "};"
     return name, textwrap.fill(res, width=79)
 
@@ -46,8 +46,9 @@ def main():
 
     for filename in embedded_files:
         name = os.path.basename(filename)
-        name, text = make_c_include(name, open(filename).read())
-        open("%s/%s.h" % (TEMPSRC_DIR, name), "wb").write(text)
+        print(f"filename: {filename}")
+        name, text = make_c_include(name, open(filename, "rb").read())
+        open("%s/%s.h" % (TEMPSRC_DIR, name), "wb").write(text.encode())
 
     cfiles = filter(lambda x: x.endswith((".c", ".C")), listdir(SRC_DIR))
 
